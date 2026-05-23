@@ -109,21 +109,18 @@ a { color: var(--color-primari); }
 .capcalera-dreta    { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 .titol-app {
-  font-size: 22px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -0.2px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.titol-icona { font-size: 24px; }
-.subtitol-app {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
-  color: rgba(255,255,255,.8);
-  padding-left: 14px;
-  border-left: 2px solid rgba(255,255,255,.3);
+  color: #fff;
+  letter-spacing: 0.2px;
+}
+.subtitol-app {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(255,255,255,.75);
+  padding-left: 16px;
+  border-left: 1.5px solid rgba(255,255,255,.3);
+  letter-spacing: 0.1px;
 }
 
 .usuari-info { display: flex; align-items: center; gap: 5px; font-size: 13px; }
