@@ -1,0 +1,8 @@
+# Els fitxers d'Apps Script NO s'han de publicar al repositori públic.
+# Contenen IDs de Sheets, IDs de Docs i la llista d'usuaris autoritzats.
+apps-script/
+
+# Fitxers del sistema
+.DS_Store
+Thumbs.db
+desktop.ini

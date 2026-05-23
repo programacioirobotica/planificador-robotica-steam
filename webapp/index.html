@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planificador d'Equip — Robòtica i STEAM</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ========== CAPÇALERA ========== -->
+  <header class="capcalera">
+    <div class="capcalera-esquerra">
+      <h1 class="titol-app">
+        <span class="titol-icona">📋</span>
+        Planificador d'Equip
+      </h1>
+      <span class="subtitol-app">Robòtica i STEAM</span>
+    </div>
+    <div class="capcalera-dreta">
+      <div class="usuari-info" id="usuari-info">
+        <span class="usuari-label">Usuari:</span>
+        <span class="usuari-nom" id="usuari-nom">Carregant…</span>
+      </div>
+      <button class="btn btn-secundari" id="btn-recarregar" title="Recarregar dades">
+        ↺ Recarregar
+      </button>
+      <button class="btn btn-accent" id="btn-sincronitzar" title="Sincronitzar tasques des de documents d'actes" style="display:none">
+        ⟳ Sincronitzar des de Docs
+      </button>
+    </div>
+  </header>
+
+  <!-- ========== MISSATGE D'ESTAT / ERROR ========== -->
+  <div id="banner-estat" class="banner-estat" style="display:none"></div>
+
+  <!-- ========== FORMULARI D'ENTRADA RÀPIDA ========== -->
+  <section class="entrada-rapida" id="seccio-entrada">
+    <form class="form-entrada" id="form-nova-tasca" autocomplete="off">
+      <input
+        type="text"
+        id="inp-tasca"
+        class="inp-tasca"
+        placeholder="Nova tasca…"
+        required
+        maxlength="300"
+      />
+      <select id="inp-responsable" class="inp-select" required>
+        <option value="">Responsable</option>
+        <option value="Albert">Albert</option>
+        <option value="Alexandra">Alexandra</option>
+        <option value="Marta">Marta</option>
+        <option value="Mercè">Mercè</option>
+      </select>
+      <input
+        type="date"
+        id="inp-data-fi"
+        class="inp-data"
+        required
+        title="Data de fi"
+      />
+      <button type="submit" class="btn btn-primari">+ Afegir</button>
+    </form>
+  </section>
+
+  <!-- ========== NAVEGACIÓ DE VISTES ========== -->
+  <nav class="nav-vistes">
+    <button class="nav-btn actiu" data-vista="tauler">Tauler</button>
+    <button class="nav-btn" data-vista="gantt">Gantt</button>
+    <button class="nav-btn" data-vista="persona">Per persona</button>
+    <button class="nav-btn" data-vista="llargues">Tasques llargues</button>
+    <button class="nav-btn" data-vista="avisos">Avisos</button>
+  </nav>
+
+  <!-- ========== ÀREA PRINCIPAL ========== -->
+  <main class="contingut-principal">
+
+    <!-- VISTA: TAULER (Kanban) -->
+    <section id="vista-tauler" class="vista activa">
+      <div class="kanban" id="kanban-columnes">
+        <div class="kanban-col" data-estat="Pendent">
+          <div class="kanban-col-cap">
+            <span class="kanban-col-titol">Pendent</span>
+            <span class="kanban-col-comptador" id="compt-pendent">0</span>
+          </div>
+          <div class="kanban-targetes" id="col-pendent"></div>
+        </div>
+        <div class="kanban-col" data-estat="En curs">
+          <div class="kanban-col-cap">
+            <span class="kanban-col-titol">En curs</span>
+            <span class="kanban-col-comptador" id="compt-en-curs">0</span>
+          </div>
+          <div class="kanban-targetes" id="col-en-curs"></div>
+        </div>
+        <div class="kanban-col" data-estat="Bloquejada">
+          <div class="kanban-col-cap">
+            <span class="kanban-col-titol">Bloquejada</span>
+            <span class="kanban-col-comptador" id="compt-bloquejada">0</span>
+          </div>
+          <div class="kanban-targetes" id="col-bloquejada"></div>
+        </div>
+        <div class="kanban-col" data-estat="Feta">
+          <div class="kanban-col-cap">
+            <span class="kanban-col-titol">Feta</span>
+            <span class="kanban-col-comptador" id="compt-feta">0</span>
+          </div>
+          <div class="kanban-targetes" id="col-feta"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA: GANTT -->
+    <section id="vista-gantt" class="vista">
+      <div class="gantt-controls">
+        <div class="gantt-mode-btns">
+          <button class="btn btn-petit actiu" id="gantt-setmanal">Setmanal</button>
+          <button class="btn btn-petit" id="gantt-mensual">Mensual</button>
+        </div>
+        <div class="gantt-filtres">
+          <label for="gantt-filtre-persona" class="label-filtre">Responsable:</label>
+          <select id="gantt-filtre-persona" class="inp-select petit">
+            <option value="totes">Totes</option>
+            <option value="Albert">Albert</option>
+            <option value="Alexandra">Alexandra</option>
+            <option value="Marta">Marta</option>
+            <option value="Mercè">Mercè</option>
+          </select>
+          <label class="label-filtre">
+            <input type="checkbox" id="gantt-mostrar-subtasques" checked />
+            Mostrar subtasques
+          </label>
+        </div>
+      </div>
+      <div class="gantt-contenidor" id="gantt-contenidor">
+        <!-- Renderitzat per app.js -->
+      </div>
+    </section>
+
+    <!-- VISTA: PER PERSONA -->
+    <section id="vista-persona" class="vista">
+      <div id="persona-grups">
+        <!-- Renderitzat per app.js -->
+      </div>
+    </section>
+
+    <!-- VISTA: TASQUES LLARGUES -->
+    <section id="vista-llargues" class="vista">
+      <p class="seccio-subtitol">Tasques que contenen subtasques</p>
+      <div id="llargues-llista">
+        <!-- Renderitzat per app.js -->
+      </div>
+    </section>
+
+    <!-- VISTA: AVISOS -->
+    <section id="vista-avisos" class="vista">
+      <div class="avisos-cap">
+        <h2 class="seccio-titol">Avisos del sistema</h2>
+        <button class="btn btn-petit" id="btn-recarregar-avisos">↺ Actualitzar</button>
+      </div>
+      <div id="avisos-llista">
+        <!-- Renderitzat per app.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== MODAL DE DETALL DE TASCA ========== -->
+  <div id="modal-tasca" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="modal-titol">
+    <div class="modal-caixa">
+      <button class="modal-tancar" id="modal-tancar" aria-label="Tancar">✕</button>
+      <div id="modal-contingut">
+        <!-- Renderitzat per app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== LOADING OVERLAY ========== -->
+  <div id="overlay-carregant" class="overlay-carregant" style="display:none">
+    <div class="spinner"></div>
+    <span>Carregant…</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
