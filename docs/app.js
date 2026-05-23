@@ -5,12 +5,11 @@
 
 // URL del desplegament RESTRINGIT (domini xtec.cat) — NOMÉS per al flux d'autenticació.
 // El navegador hi accedeix directament (window.location.href), mai via fetch().
-const AUTH_URL = "https://script.google.com/macros/s/AKfycbyQS4nanMcZ4bA9EtN020XqsOu2_o9ioaXhRtHQrCU7fiAxTuc_-Hn0IrB4GWMg-VUS/exec";
+const AUTH_URL = "https://script.google.com/a/macros/xtec.cat/s/AKfycbwYjMiF_bc3dK_m8IHvSesmyMwLkIRJVaoM0ZPZ-Y1Sv96cGcHXGeCXk33pWkhVmzVv/exec";
 
 // URL del desplegament PÚBLIC ANÒNIM — per a totes les crides fetch() de l'API.
-// Crea un segon desplegament: "Executar com: Jo" + "Qui té accés: Qualsevol"
-// i substitueix la URL de sota per la que et doni Apps Script.
-const API_URL = "https://script.google.com/macros/s/AKfycbwYjMiF_bc3dK_m8IHvSesmyMwLkIRJVaoM0ZPZ-Y1Sv96cGcHXGeCXk33pWkhVmzVv/exec";
+// Executar com: Jo (ahiguer2@xtec.cat) · Qui pot accedir: Qualsevol (anònim)
+const API_URL = "https://script.google.com/macros/s/AKfycbzpXtPLh5AzRAXtyB3ylFMsFtSDZOkVOA55xyB9C8w9vFu6dtxtonSqAcDS95WDKTIO/exec";
 
 // Clau localStorage on es guarda el token de sessió
 const SESSION_KEY = "planificador_sess_v1";
