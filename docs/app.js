@@ -10,7 +10,7 @@ const AUTH_URL = "https://script.google.com/a/macros/xtec.cat/s/AKfycbyxf-j6hlCt
 // URL del desplegament PÚBLIC ANÒNIM — per a totes les crides fetch() de l'API.
 // Crea un segon desplegament: "Executar com: Jo" + "Qui té accés: Qualsevol"
 // i substitueix la URL de sota per la que et doni Apps Script.
-const API_URL = "https://script.google.com/macros/s/SUBSTITUEIX_PER_LA_URL_ANONIMA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbznTE26CYih8YIuM6lR2gCKQGIbl-ZGxr4S6j8sEZpRu-kV6xt-DxnZJVykIkDzSeM0/exec";
 
 // Clau localStorage on es guarda el token de sessió
 const SESSION_KEY = "planificador_sess_v1";
