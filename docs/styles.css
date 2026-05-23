@@ -96,32 +96,52 @@ a { color: var(--color-primari); }
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 24px;
-  background: var(--color-superfície);
-  border-bottom: 1px solid var(--color-vora);
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #1a3585 0%, #3b6ee8 100%);
+  border-bottom: none;
+  box-shadow: 0 3px 16px rgba(27,53,140,.28);
   position: sticky;
   top: 0;
   z-index: 100;
   flex-wrap: wrap;
 }
-.capcalera-esquerra { display: flex; align-items: baseline; gap: 10px; }
+.capcalera-esquerra { display: flex; align-items: center; gap: 14px; }
 .capcalera-dreta    { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 .titol-app {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--color-primari);
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.2px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
-.titol-icona { font-size: 20px; }
-.subtitol-app { font-size: 12px; color: var(--color-text-suau); }
+.titol-icona { font-size: 24px; }
+.subtitol-app {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255,255,255,.8);
+  padding-left: 14px;
+  border-left: 2px solid rgba(255,255,255,.3);
+}
 
 .usuari-info { display: flex; align-items: center; gap: 5px; font-size: 13px; }
-.usuari-label { color: var(--color-text-suau); }
-.usuari-nom   { font-weight: 600; }
+.usuari-label { color: rgba(255,255,255,.65); }
+.usuari-nom   { font-weight: 700; color: #fff; }
+
+.capcalera .btn-secundari {
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border-color: rgba(255,255,255,.25);
+}
+.capcalera .btn-secundari:hover { background: rgba(255,255,255,.22); }
+.capcalera .btn-accent {
+  background: rgba(255,255,255,.18);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.35);
+}
+.capcalera .btn-accent:hover { background: rgba(255,255,255,.28); }
 
 /* ---------- BANNER D'ESTAT ---------- */
 .banner-estat {
@@ -135,9 +155,18 @@ a { color: var(--color-primari); }
 
 /* ---------- ENTRADA RÀPIDA ---------- */
 .entrada-rapida {
-  background: var(--color-superfície);
-  border-bottom: 1px solid var(--color-vora);
-  padding: 12px 24px;
+  background: linear-gradient(180deg, #eef2fd 0%, #f5f6fa 100%);
+  border-bottom: 1px solid #d0d9f5;
+  padding: 14px 28px 16px;
+  box-shadow: 0 2px 8px rgba(59,110,232,.07);
+}
+.form-titol {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--color-primari);
+  margin-bottom: 8px;
 }
 .form-entrada {
   display: flex;
@@ -148,30 +177,34 @@ a { color: var(--color-primari); }
 .inp-tasca {
   flex: 1;
   min-width: 200px;
-  padding: 8px 12px;
-  border: 1px solid var(--color-vora);
+  padding: 9px 13px;
+  border: 1.5px solid #c2cef0;
   border-radius: var(--radi);
   font-size: 14px;
+  background: #fff;
   transition: var(--transicio);
 }
 .inp-tasca:focus { outline: none; border-color: var(--color-primari); box-shadow: 0 0 0 3px rgba(59,110,232,.15); }
 .inp-select {
-  padding: 8px 10px;
-  border: 1px solid var(--color-vora);
+  padding: 9px 10px;
+  border: 1.5px solid #c2cef0;
   border-radius: var(--radi);
   font-size: 13px;
-  background: var(--color-superfície);
+  background: #fff;
   color: var(--color-text);
+  transition: var(--transicio);
 }
-.inp-select:focus { outline: none; border-color: var(--color-primari); }
+.inp-select:focus { outline: none; border-color: var(--color-primari); box-shadow: 0 0 0 3px rgba(59,110,232,.15); }
 .inp-select.petit { padding: 5px 8px; font-size: 12px; }
 .inp-data {
-  padding: 7px 10px;
-  border: 1px solid var(--color-vora);
+  padding: 8px 10px;
+  border: 1.5px solid #c2cef0;
   border-radius: var(--radi);
   font-size: 13px;
+  background: #fff;
+  transition: var(--transicio);
 }
-.inp-data:focus { outline: none; border-color: var(--color-primari); }
+.inp-data:focus { outline: none; border-color: var(--color-primari); box-shadow: 0 0 0 3px rgba(59,110,232,.15); }
 
 /* ---------- NAVEGACIÓ DE VISTES ---------- */
 .nav-vistes {
