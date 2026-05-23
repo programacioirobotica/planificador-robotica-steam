@@ -3,8 +3,14 @@
 // Sense dependències externes · Vanilla JS
 // ============================================================
 
-// URL pública de la Web App d'Apps Script (l'única dada sensible permesa al frontend)
-const API_URL = "https://script.google.com/a/macros/xtec.cat/s/AKfycbyxf-j6hlCtVn3UxsPm5H0e_4MxNJyZ9Dwi3npvM1XOn8fPpSJ-Mc-DcwhEu1aQYsYi/exec";
+// URL del desplegament RESTRINGIT (domini xtec.cat) — NOMÉS per al flux d'autenticació.
+// El navegador hi accedeix directament (window.location.href), mai via fetch().
+const AUTH_URL = "https://script.google.com/a/macros/xtec.cat/s/AKfycbyxf-j6hlCtVn3UxsPm5H0e_4MxNJyZ9Dwi3npvM1XOn8fPpSJ-Mc-DcwhEu1aQYsYi/exec";
+
+// URL del desplegament PÚBLIC ANÒNIM — per a totes les crides fetch() de l'API.
+// Crea un segon desplegament: "Executar com: Jo" + "Qui té accés: Qualsevol"
+// i substitueix la URL de sota per la que et doni Apps Script.
+const API_URL = "https://script.google.com/macros/s/SUBSTITUEIX_PER_LA_URL_ANONIMA/exec";
 
 // Clau localStorage on es guarda el token de sessió
 const SESSION_KEY = "planificador_sess_v1";
@@ -41,8 +47,9 @@ function esborrarToken() {
 // Redirigeix el navegador a l'Apps Script perquè Google autentiqui l'usuari.
 // Quan torna, porta ?session_token=... a la URL.
 function iniciarSessio() {
+  // Usa AUTH_URL (domini restringit) per a la redirecció d'autenticació
   const redirectUri = window.location.origin + window.location.pathname;
-  window.location.href = API_URL + "?accio=auth&redirect=" + encodeURIComponent(redirectUri);
+  window.location.href = AUTH_URL + "?accio=auth&redirect=" + encodeURIComponent(redirectUri);
 }
 
 function tancarSessio() {
