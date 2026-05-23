@@ -747,6 +747,29 @@ a { color: var(--color-primari); }
 }
 @keyframes gira { to { transform: rotate(360deg); } }
 
+/* ---------- TASQUES ENDARRERIDES ---------- */
+.targeta--vencuda {
+  background: #fff5f5;
+  border-left-color: var(--color-perill) !important;
+}
+.badge-vencuda {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #fde0e0;
+  color: var(--color-perill);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  vertical-align: middle;
+}
+.data-vencuda { color: var(--color-perill); font-weight: 600; }
+.gantt-barra--vencuda {
+  outline: 2px solid var(--color-perill);
+  outline-offset: -2px;
+}
+
 /* ---------- BUIT / SENSE DADES ---------- */
 .estat-buit {
   text-align: center;

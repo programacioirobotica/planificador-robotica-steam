@@ -106,6 +106,10 @@ function dataATimestamp(iso) {
   return iso ? new Date(iso + "T00:00:00").getTime() : null;
 }
 
+function estaVencuda(t) {
+  return t.data_fi && t.estat !== "Feta" && t.data_fi < avuiISO();
+}
+
 function escHtml(str) {
   return String(str || "")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;")
@@ -315,10 +319,11 @@ function renderitzarTauler() {
 
 function crearTargetaKanban(t) {
   const { total, fetes } = progresSubtasques(t.codi);
-  const pct = total > 0 ? Math.round((fetes / total) * 100) : 0;
+  const pct     = total > 0 ? Math.round((fetes / total) * 100) : 0;
+  const vencuda = estaVencuda(t);
 
   const div = document.createElement("div");
-  div.className      = "targeta";
+  div.className      = `targeta${vencuda ? " targeta--vencuda" : ""}`;
   div.dataset.estat  = t.estat;
   div.dataset.codi   = t.codi;
 
@@ -342,7 +347,8 @@ function crearTargetaKanban(t) {
       </div>
       <div class="targeta-meta-fila">
         <span>Inici:</span> ${escHtml(formatarData(t.data_inici))} &nbsp;·&nbsp;
-        <span>Fi:</span> ${escHtml(formatarData(t.data_fi))}
+        <span>Fi:</span> <span class="${vencuda ? "data-vencuda" : ""}">${escHtml(formatarData(t.data_fi))}</span>
+        ${vencuda ? '<span class="badge-vencuda">Endarrerida</span>' : ""}
       </div>
     </div>
     ${progresHtml}
@@ -412,7 +418,7 @@ function renderitzarGantt() {
       <div class="gantt-fila-barra-contenidor" style="width:${amp}px">
         <div class="gantt-linia-avui" style="left:${avuiX}px"></div>
         ${cols.map(c=>`<div class="gantt-cel" style="left:${c.px}px;width:${c.amplada}px"></div>`).join("")}
-        <div class="gantt-barra${esSubtasca?" subtasca-barra":""}" data-estat="${escHtml(t.estat)}"
+        <div class="gantt-barra${esSubtasca?" subtasca-barra":""}${estaVencuda(t)?" gantt-barra--vencuda":""}" data-estat="${escHtml(t.estat)}"
              data-codi="${escHtml(t.codi)}" style="left:${esq}px;width:${bar}px"
              title="${escHtml(t.tasca)} · ${escHtml(formatarData(t.data_inici))} → ${escHtml(formatarData(t.data_fi))}">
           ${escHtml(t.responsable)}
@@ -494,7 +500,7 @@ function renderitzarPerPersona() {
             <div class="persona-tasca-fila" data-codi="${escHtml(t.codi)}">
               <span class="btn-estat btn-estat-${t.estat.toLowerCase().replace(" ","-")}">${escHtml(t.estat)}</span>
               <span class="persona-tasca-titol">${escHtml(t.tasca)}</span>
-              <span class="persona-tasca-data">Fi: ${escHtml(formatarData(t.data_fi))}</span>
+              <span class="persona-tasca-data${estaVencuda(t) ? " data-vencuda" : ""}">Fi: ${escHtml(formatarData(t.data_fi))}${estaVencuda(t) ? ' <span class="badge-vencuda">!</span>' : ""}</span>
             </div>`).join("")
         }
       </div>
@@ -619,7 +625,8 @@ function obrirModalTasca(codi) {
       <div class="modal-info-grup"><span class="modal-info-label">Responsable</span>
         <span class="modal-info-valor"><span class="xip-responsable xip-responsable-${escHtml(t.responsable)}">${escHtml(t.responsable)}</span></span></div>
       <div class="modal-info-grup"><span class="modal-info-label">Inici</span><span class="modal-info-valor">${escHtml(formatarData(t.data_inici))}</span></div>
-      <div class="modal-info-grup"><span class="modal-info-label">Fi</span><span class="modal-info-valor">${escHtml(formatarData(t.data_fi))}</span></div>
+      <div class="modal-info-grup"><span class="modal-info-label">Fi</span>
+        <span class="modal-info-valor${estaVencuda(t) ? " data-vencuda" : ""}">${escHtml(formatarData(t.data_fi))}${estaVencuda(t) ? ' <span class="badge-vencuda">Endarrerida</span>' : ""}</span></div>
       <div class="modal-info-grup"><span class="modal-info-label">Tipus</span><span class="modal-info-valor">${escHtml(t.tipus)}</span></div>
       <div class="modal-info-grup"><span class="modal-info-label">Prioritat</span><span class="modal-info-valor">${escHtml(t.prioritat)}</span></div>
       ${t.origen_doc_titol ? `<div class="modal-info-grup" style="grid-column:span 2"><span class="modal-info-label">Origen</span><span class="modal-info-valor">${escHtml(t.origen_doc_titol)}</span></div>` : ""}
