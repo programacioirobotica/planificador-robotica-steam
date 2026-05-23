@@ -5,7 +5,7 @@
 
 // URL del desplegament RESTRINGIT (domini xtec.cat) — NOMÉS per al flux d'autenticació.
 // El navegador hi accedeix directament (window.location.href), mai via fetch().
-const AUTH_URL = "https://script.google.com/a/macros/xtec.cat/s/AKfycbyxf-j6hlCtVn3UxsPm5H0e_4MxNJyZ9Dwi3npvM1XOn8fPpSJ-Mc-DcwhEu1aQYsYi/exec";
+const AUTH_URL = "https://script.google.com/macros/s/AKfycbyQS4nanMcZ4bA9EtN020XqsOu2_o9ioaXhRtHQrCU7fiAxTuc_-Hn0IrB4GWMg-VUS/exec";
 
 // URL del desplegament PÚBLIC ANÒNIM — per a totes les crides fetch() de l'API.
 // Crea un segon desplegament: "Executar com: Jo" + "Qui té accés: Qualsevol"
