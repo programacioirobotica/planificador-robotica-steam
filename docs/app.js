@@ -84,7 +84,8 @@ async function apiSincronitzar()   { return crideApi({ accio: "sincronitzarTasqu
 
 async function apiCrearTasca(dades)    { return crideApi(Object.assign({ accio: "crearTasca" }, dades)); }
 async function apiCrearSubtasca(dades) { return crideApi(Object.assign({ accio: "crearSubtasca" }, dades)); }
-async function apiCanviarEstat(codi, estat) { return crideApi({ accio: "canviarEstat", codi, estat }); }
+async function apiCanviarEstat(codi, estat)       { return crideApi({ accio: "canviarEstat", codi, estat }); }
+async function apiCanviarDataFi(codi, data_fi)   { return crideApi({ accio: "canviarDataFi", codi, data_fi }); }
 async function apiArxivarTasca(codi)   { return crideApi({ accio: "arxivarTasca", codi }); }
 
 // ============================================================
@@ -625,8 +626,13 @@ function obrirModalTasca(codi) {
       <div class="modal-info-grup"><span class="modal-info-label">Responsable</span>
         <span class="modal-info-valor"><span class="xip-responsable xip-responsable-${escHtml(t.responsable)}">${escHtml(t.responsable)}</span></span></div>
       <div class="modal-info-grup"><span class="modal-info-label">Inici</span><span class="modal-info-valor">${escHtml(formatarData(t.data_inici))}</span></div>
-      <div class="modal-info-grup"><span class="modal-info-label">Fi</span>
-        <span class="modal-info-valor${estaVencuda(t) ? " data-vencuda" : ""}">${escHtml(formatarData(t.data_fi))}${estaVencuda(t) ? ' <span class="badge-vencuda">Endarrerida</span>' : ""}</span></div>
+      <div class="modal-info-grup">
+        <span class="modal-info-label">Fi${estaVencuda(t) ? ' <span class="badge-vencuda">Endarrerida</span>' : ""}</span>
+        <div class="modal-data-edit">
+          <input type="date" class="inp-data" id="modal-inp-data-fi" value="${escHtml(t.data_fi || "")}"/>
+          <button class="btn btn-petit btn-primari" id="btn-guardar-data-fi" data-codi="${escHtml(t.codi)}">Guardar</button>
+        </div>
+      </div>
       <div class="modal-info-grup"><span class="modal-info-label">Tipus</span><span class="modal-info-valor">${escHtml(t.tipus)}</span></div>
       <div class="modal-info-grup"><span class="modal-info-label">Prioritat</span><span class="modal-info-valor">${escHtml(t.prioritat)}</span></div>
       ${t.origen_doc_titol ? `<div class="modal-info-grup" style="grid-column:span 2"><span class="modal-info-label">Origen</span><span class="modal-info-valor">${escHtml(t.origen_doc_titol)}</span></div>` : ""}
@@ -660,6 +666,11 @@ function obrirModalTasca(codi) {
   });
   contingut.querySelectorAll(".modal-accions-estat .btn").forEach(btn => {
     btn.addEventListener("click", () => accionarCanviEstat(btn.dataset.codi, btn.dataset.estat));
+  });
+  document.getElementById("btn-guardar-data-fi")?.addEventListener("click", async () => {
+    const novaData = document.getElementById("modal-inp-data-fi")?.value;
+    if (!novaData) { mostrarBanner("Selecciona una data de fi vàlida.", "error", 3000); return; }
+    await accionarCanviarDataFi(t.codi, novaData);
   });
   const formSub = document.getElementById("form-nova-subtasca");
   if (formSub) formSub.addEventListener("submit", async e => { e.preventDefault(); await accionarCrearSubtasca(formSub.dataset.parent); });
@@ -697,6 +708,16 @@ async function accionarCrearSubtasca(parentId) {
   mostrarCarregant(false);
   if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
   mostrarBanner(`Subtasca creada (${r.codi}).`, "ok");
+  tancarModal();
+  await carregarTasques();
+}
+
+async function accionarCanviarDataFi(codi, data_fi) {
+  mostrarCarregant(true);
+  const r = await apiCanviarDataFi(codi, data_fi);
+  mostrarCarregant(false);
+  if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
+  mostrarBanner("Data de fi actualitzada.", "ok");
   tancarModal();
   await carregarTasques();
 }

@@ -716,6 +716,14 @@ a { color: var(--color-primari); }
 }
 .form-subtasca .inp-tasca { min-width: 150px; }
 
+.modal-data-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.modal-data-edit .inp-data { padding: 5px 8px; font-size: 13px; }
+
 .modal-accio-arxivar {
   margin-top: 20px;
   padding-top: 14px;
