@@ -85,7 +85,8 @@ async function apiSincronitzar()   { return crideApi({ accio: "sincronitzarTasqu
 async function apiCrearTasca(dades)    { return crideApi(Object.assign({ accio: "crearTasca" }, dades)); }
 async function apiCrearSubtasca(dades) { return crideApi(Object.assign({ accio: "crearSubtasca" }, dades)); }
 async function apiCanviarEstat(codi, estat)       { return crideApi({ accio: "canviarEstat", codi, estat }); }
-async function apiCanviarDataFi(codi, data_fi)   { return crideApi({ accio: "canviarDataFi", codi, data_fi }); }
+async function apiCanviarDataFi(codi, data_fi)         { return crideApi({ accio: "canviarDataFi", codi, data_fi }); }
+async function apiCanviarParticipants(codi, participants) { return crideApi({ accio: "canviarParticipants", codi, participants }); }
 async function apiArxivarTasca(codi)   { return crideApi({ accio: "arxivarTasca", codi }); }
 
 // ============================================================
@@ -135,6 +136,11 @@ function obtenirSubtasques(codiMare) {
 
 function tasquesPrincipals() {
   return App.tasques.filter(t => !t.parent_id || t.tipus !== "Subtasca");
+}
+
+function llistarParticipants(t) {
+  if (!t.participants) return [];
+  return t.participants.split(",").map(p => p.trim()).filter(Boolean);
 }
 
 function progresSubtasques(codiMare) {
@@ -351,6 +357,11 @@ function crearTargetaKanban(t) {
         <span>Fi:</span> <span class="${vencuda ? "data-vencuda" : ""}">${escHtml(formatarData(t.data_fi))}</span>
         ${vencuda ? '<span class="badge-vencuda">Endarrerida</span>' : ""}
       </div>
+      ${llistarParticipants(t).length > 0 ? `
+      <div class="targeta-meta-fila">
+        <span>També:</span>
+        ${llistarParticipants(t).map(p => `<span class="xip-responsable xip-responsable-${escHtml(p)}">${escHtml(p)}</span>`).join("")}
+      </div>` : ""}
     </div>
     ${progresHtml}
     <div class="targeta-accions">${btnsEstat}</div>`;
@@ -486,7 +497,9 @@ function renderitzarPerPersona() {
   const ini  = { Albert:"AL", Alexandra:"AX", Marta:"MT", Mercè:"MC" };
 
   cont.innerHTML = MEMBRES.map(membre => {
-    const tt = tasquesPrincipals().filter(t => t.responsable === membre && ["Pendent","En curs","Bloquejada"].includes(t.estat));
+    const tt = tasquesPrincipals().filter(t =>
+      (t.responsable === membre || llistarParticipants(t).includes(membre)) &&
+      ["Pendent","En curs","Bloquejada"].includes(t.estat));
     return `
     <div class="persona-grup">
       <div class="persona-cap">
@@ -639,6 +652,17 @@ function obrirModalTasca(codi) {
       ${esSubtasca && t.parent_id ? `<div class="modal-info-grup" style="grid-column:span 2"><span class="modal-info-label">Tasca mare</span>
         <span class="modal-info-valor" style="cursor:pointer;color:var(--color-primari)" data-nav-codi="${escHtml(t.parent_id)}">${escHtml(t.parent_id)}</span></div>` : ""}
     </div>
+    <div class="modal-seccio-titol">Participants addicionals</div>
+    <div class="modal-participants">
+      ${MEMBRES.filter(m => m !== t.responsable).map(m => {
+        const actiu = llistarParticipants(t).includes(m);
+        return `<label class="participant-label">
+          <input type="checkbox" class="part-check" value="${escHtml(m)}" ${actiu ? "checked" : ""}/>
+          <span class="xip-responsable xip-responsable-${escHtml(m)}">${escHtml(m)}</span>
+        </label>`;
+      }).join("")}
+      <button class="btn btn-petit btn-secundari" id="btn-guardar-participants">Guardar</button>
+    </div>
     <div class="modal-seccio-titol">Estat</div>
     <div class="modal-accions-estat">${btnsEstat}</div>
     ${progresHtml}
@@ -666,6 +690,11 @@ function obrirModalTasca(codi) {
   });
   contingut.querySelectorAll(".modal-accions-estat .btn").forEach(btn => {
     btn.addEventListener("click", () => accionarCanviEstat(btn.dataset.codi, btn.dataset.estat));
+  });
+  document.getElementById("btn-guardar-participants")?.addEventListener("click", async () => {
+    const checks = contingut.querySelectorAll(".part-check:checked");
+    const participants = Array.from(checks).map(c => c.value).join(",");
+    await accionarActualitzarParticipants(t.codi, participants);
   });
   document.getElementById("btn-guardar-data-fi")?.addEventListener("click", async () => {
     const novaData = document.getElementById("modal-inp-data-fi")?.value;
@@ -708,6 +737,16 @@ async function accionarCrearSubtasca(parentId) {
   mostrarCarregant(false);
   if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
   mostrarBanner(`Subtasca creada (${r.codi}).`, "ok");
+  tancarModal();
+  await carregarTasques();
+}
+
+async function accionarActualitzarParticipants(codi, participants) {
+  mostrarCarregant(true);
+  const r = await apiCanviarParticipants(codi, participants);
+  mostrarCarregant(false);
+  if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
+  mostrarBanner("Participants actualitzats.", "ok");
   tancarModal();
   await carregarTasques();
 }

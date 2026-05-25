@@ -716,6 +716,21 @@ a { color: var(--color-primari); }
 }
 .form-subtasca .inp-tasca { min-width: 150px; }
 
+.modal-participants {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.participant-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.participant-label input[type="checkbox"] { cursor: pointer; }
+
 .modal-data-edit {
   display: flex;
   align-items: center;
