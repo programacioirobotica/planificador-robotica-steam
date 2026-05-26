@@ -24,8 +24,9 @@ const App = {
   ganttSubtasques: true
 };
 
-const MEMBRES = ["Albert", "Alexandra", "Marta", "Mercè"];
-const ESTATS  = ["Pendent", "En curs", "Bloquejada", "Feta"];
+const MEMBRES   = ["Albert", "Alexandra", "Marta", "Mercè"];
+const ESTATS    = ["Pendent", "En curs", "Bloquejada", "Feta"];
+const PROJECTES = ["REA", "Fabricació digital", "Scratch", "STEAMCat", "Espai", "Activitats robòtica"];
 
 // ============================================================
 // GESTIÓ DE SESSIÓ
@@ -87,6 +88,7 @@ async function apiCrearSubtasca(dades) { return crideApi(Object.assign({ accio: 
 async function apiCanviarEstat(codi, estat)       { return crideApi({ accio: "canviarEstat", codi, estat }); }
 async function apiCanviarDataFi(codi, data_fi)         { return crideApi({ accio: "canviarDataFi", codi, data_fi }); }
 async function apiCanviarParticipants(codi, participants) { return crideApi({ accio: "canviarParticipants", codi, participants }); }
+async function apiCanviarProjecte(codi, projecte)        { return crideApi({ accio: "canviarProjecte", codi, projecte }); }
 async function apiArxivarTasca(codi)   { return crideApi({ accio: "arxivarTasca", codi }); }
 
 // ============================================================
@@ -346,6 +348,7 @@ function crearTargetaKanban(t) {
     .join("");
 
   div.innerHTML = `
+    ${t.projecte ? `<div class="badge-projecte">${escHtml(t.projecte)}</div>` : ""}
     <div class="targeta-titol">${escHtml(t.tasca)}</div>
     <div class="targeta-meta">
       <div class="targeta-meta-fila"><span>Creador/a:</span> <strong>${escHtml(t.creador)}</strong></div>
@@ -648,6 +651,16 @@ function obrirModalTasca(codi) {
       </div>
       <div class="modal-info-grup"><span class="modal-info-label">Tipus</span><span class="modal-info-valor">${escHtml(t.tipus)}</span></div>
       <div class="modal-info-grup"><span class="modal-info-label">Prioritat</span><span class="modal-info-valor">${escHtml(t.prioritat)}</span></div>
+      <div class="modal-info-grup" style="grid-column:span 2">
+        <span class="modal-info-label">Projecte</span>
+        <div class="modal-data-edit">
+          <select class="inp-select" id="modal-inp-projecte">
+            <option value="">— Sense projecte —</option>
+            ${PROJECTES.map(p => `<option value="${escHtml(p)}"${t.projecte === p ? " selected" : ""}>${escHtml(p)}</option>`).join("")}
+          </select>
+          <button class="btn btn-petit btn-primari" id="btn-guardar-projecte">Guardar</button>
+        </div>
+      </div>
       ${t.origen_doc_titol ? `<div class="modal-info-grup" style="grid-column:span 2"><span class="modal-info-label">Origen</span><span class="modal-info-valor">${escHtml(t.origen_doc_titol)}</span></div>` : ""}
       ${esSubtasca && t.parent_id ? `<div class="modal-info-grup" style="grid-column:span 2"><span class="modal-info-label">Tasca mare</span>
         <span class="modal-info-valor" style="cursor:pointer;color:var(--color-primari)" data-nav-codi="${escHtml(t.parent_id)}">${escHtml(t.parent_id)}</span></div>` : ""}
@@ -690,6 +703,10 @@ function obrirModalTasca(codi) {
   });
   contingut.querySelectorAll(".modal-accions-estat .btn").forEach(btn => {
     btn.addEventListener("click", () => accionarCanviEstat(btn.dataset.codi, btn.dataset.estat));
+  });
+  document.getElementById("btn-guardar-projecte")?.addEventListener("click", async () => {
+    const projecte = document.getElementById("modal-inp-projecte")?.value ?? "";
+    await accionarCanviarProjecte(t.codi, projecte);
   });
   document.getElementById("btn-guardar-participants")?.addEventListener("click", async () => {
     const checks = contingut.querySelectorAll(".part-check:checked");
@@ -737,6 +754,16 @@ async function accionarCrearSubtasca(parentId) {
   mostrarCarregant(false);
   if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
   mostrarBanner(`Subtasca creada (${r.codi}).`, "ok");
+  tancarModal();
+  await carregarTasques();
+}
+
+async function accionarCanviarProjecte(codi, projecte) {
+  mostrarCarregant(true);
+  const r = await apiCanviarProjecte(codi, projecte);
+  mostrarCarregant(false);
+  if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
+  mostrarBanner("Projecte actualitzat.", "ok");
   tancarModal();
   await carregarTasques();
 }
