@@ -57,6 +57,8 @@
         required
         title="Data de fi"
       />
+      <select id="inp-projecte" class="inp-select" title="Projecte (opcional)"></select>
+      <input type="text" id="inp-projecte-nou" class="inp-tasca" placeholder="Nom del projecte…" maxlength="60" style="display:none;max-width:160px"/>
       <button type="submit" class="btn btn-primari">+ Afegir</button>
     </form>
   </section>
@@ -67,6 +69,7 @@
     <button class="nav-btn" data-vista="gantt">Gantt</button>
     <button class="nav-btn" data-vista="persona">Per persona</button>
     <button class="nav-btn" data-vista="llargues">Tasques llargues</button>
+    <button class="nav-btn" data-vista="projectes">Projectes</button>
     <button class="nav-btn" data-vista="avisos">Avisos</button>
   </nav>
 
@@ -147,6 +150,11 @@
       <div id="llargues-llista">
         <!-- Renderitzat per app.js -->
       </div>
+    </section>
+
+    <!-- VISTA: PER PROJECTE -->
+    <section id="vista-projectes" class="vista">
+      <div id="projectes-llista"></div>
     </section>
 
     <!-- VISTA: AVISOS -->

@@ -288,11 +288,12 @@ function canviarVista(vista) {
 
 function renderitzarVistaActual() {
   switch (App.vistaActual) {
-    case "tauler":   renderitzarTauler();            break;
-    case "gantt":    renderitzarGantt();             break;
-    case "persona":  renderitzarPerPersona();        break;
-    case "llargues": renderitzarLlargues();          break;
-    case "avisos":   carregarIRenderitzarAvisos();   break;
+    case "tauler":    renderitzarTauler();            break;
+    case "gantt":     renderitzarGantt();             break;
+    case "persona":   renderitzarPerPersona();        break;
+    case "llargues":  renderitzarLlargues();          break;
+    case "projectes": renderitzarPerProjecte();       break;
+    case "avisos":    carregarIRenderitzarAvisos();   break;
   }
 }
 
@@ -530,6 +531,57 @@ function renderitzarPerPersona() {
 }
 
 // ============================================================
+// VISTA: PER PROJECTE
+// ============================================================
+
+function renderitzarPerProjecte() {
+  const cont = document.getElementById("projectes-llista");
+  const principals = tasquesPrincipals();
+
+  const grups = {};
+  for (const t of principals) {
+    const k = t.projecte || "";
+    if (!grups[k]) grups[k] = [];
+    grups[k].push(t);
+  }
+
+  const ordre = [
+    ...PROJECTES.filter(p => grups[p]),
+    ...Object.keys(grups).filter(p => p && !PROJECTES.includes(p)),
+    ...(grups[""] ? [""] : [])
+  ];
+
+  if (ordre.length === 0) {
+    cont.innerHTML = `<div class="estat-buit"><div class="estat-buit-icona">📁</div><div class="estat-buit-text">Cap tasca</div></div>`;
+    return;
+  }
+
+  cont.innerHTML = ordre.map(proj => {
+    const tt  = grups[proj];
+    const nom = proj || "Sense projecte";
+    const files = tt.map(t => `
+      <div class="persona-tasca-fila" data-codi="${escHtml(t.codi)}">
+        <span class="btn-estat btn-estat-${t.estat.toLowerCase().replace(" ","-")}">${escHtml(t.estat)}</span>
+        <span class="persona-tasca-titol">${escHtml(t.tasca)}</span>
+        <span class="xip-responsable xip-responsable-${escHtml(t.responsable)}">${escHtml(t.responsable)}</span>
+        <span class="persona-tasca-data${estaVencuda(t) ? " data-vencuda" : ""}">Fi: ${escHtml(formatarData(t.data_fi))}</span>
+      </div>`).join("");
+    return `
+    <div class="persona-grup">
+      <div class="persona-cap">
+        <span class="badge-projecte" style="font-size:13px;padding:3px 10px">${escHtml(nom)}</span>
+        <span class="persona-recompte">${tt.length} tasca${tt.length !== 1 ? "s" : ""}</span>
+      </div>
+      <div class="persona-tasques">${files}</div>
+    </div>`;
+  }).join("");
+
+  cont.querySelectorAll(".persona-tasca-fila").forEach(f => {
+    f.addEventListener("click", () => obrirModalTasca(f.dataset.codi));
+  });
+}
+
+// ============================================================
 // VISTA: TASQUES LLARGUES
 // ============================================================
 
@@ -657,7 +709,10 @@ function obrirModalTasca(codi) {
           <select class="inp-select" id="modal-inp-projecte">
             <option value="">— Sense projecte —</option>
             ${PROJECTES.map(p => `<option value="${escHtml(p)}"${t.projecte === p ? " selected" : ""}>${escHtml(p)}</option>`).join("")}
+            ${t.projecte && !PROJECTES.includes(t.projecte) ? `<option value="${escHtml(t.projecte)}" selected>${escHtml(t.projecte)}</option>` : ""}
+            <option value="__nou__">➕ Projecte nou…</option>
           </select>
+          <input type="text" id="modal-inp-projecte-nou" class="inp-tasca" placeholder="Nom del projecte…" maxlength="60" style="display:none;max-width:160px"/>
           <button class="btn btn-petit btn-primari" id="btn-guardar-projecte">Guardar</button>
         </div>
       </div>
@@ -704,8 +759,14 @@ function obrirModalTasca(codi) {
   contingut.querySelectorAll(".modal-accions-estat .btn").forEach(btn => {
     btn.addEventListener("click", () => accionarCanviEstat(btn.dataset.codi, btn.dataset.estat));
   });
+  const selModalProj = document.getElementById("modal-inp-projecte");
+  selModalProj?.addEventListener("change", () => {
+    const nouEl = document.getElementById("modal-inp-projecte-nou");
+    nouEl.style.display = selModalProj.value === "__nou__" ? "block" : "none";
+  });
   document.getElementById("btn-guardar-projecte")?.addEventListener("click", async () => {
-    const projecte = document.getElementById("modal-inp-projecte")?.value ?? "";
+    let projecte = selModalProj?.value ?? "";
+    if (projecte === "__nou__") projecte = document.getElementById("modal-inp-projecte-nou")?.value.trim() ?? "";
     await accionarCanviarProjecte(t.codi, projecte);
   });
   document.getElementById("btn-guardar-participants")?.addEventListener("click", async () => {
@@ -802,9 +863,25 @@ async function accionarArxivar(codi) {
 // CONFIGURACIÓ D'EVENTS
 // ============================================================
 
+function poblarSelectProjecte(selectEl) {
+  selectEl.innerHTML =
+    `<option value="">Projecte (opcional)</option>` +
+    PROJECTES.map(p => `<option value="${escHtml(p)}">${escHtml(p)}</option>`).join("") +
+    `<option value="__nou__">➕ Projecte nou…</option>`;
+}
+
 function configurarEventos() {
   document.querySelectorAll(".nav-btn").forEach(btn => {
     btn.addEventListener("click", () => canviarVista(btn.dataset.vista));
+  });
+
+  // Popular el select de projecte del formulari
+  const selProj = document.getElementById("inp-projecte");
+  poblarSelectProjecte(selProj);
+  selProj.addEventListener("change", () => {
+    const nouEl = document.getElementById("inp-projecte-nou");
+    nouEl.style.display = selProj.value === "__nou__" ? "block" : "none";
+    if (selProj.value !== "__nou__") nouEl.value = "";
   });
 
   document.getElementById("form-nova-tasca").addEventListener("submit", async e => {
@@ -814,12 +891,16 @@ function configurarEventos() {
     const data_fi     = document.getElementById("inp-data-fi").value;
     if (!tasca || !responsable || !data_fi) return;
 
+    let projecte = document.getElementById("inp-projecte").value;
+    if (projecte === "__nou__") projecte = document.getElementById("inp-projecte-nou").value.trim();
+
     mostrarCarregant(true);
-    const r = await apiCrearTasca({ tasca, responsable, data_fi });
+    const r = await apiCrearTasca({ tasca, responsable, data_fi, projecte });
     mostrarCarregant(false);
     if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
     mostrarBanner(`Tasca creada correctament (${r.codi}).`, "ok");
     document.getElementById("form-nova-tasca").reset();
+    document.getElementById("inp-projecte-nou").style.display = "none";
     await carregarTasques();
   });
 
