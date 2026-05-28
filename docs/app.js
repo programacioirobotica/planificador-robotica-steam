@@ -85,10 +85,9 @@ async function apiSincronitzar()   { return crideApi({ accio: "sincronitzarTasqu
 
 async function apiCrearTasca(dades)    { return crideApi(Object.assign({ accio: "crearTasca" }, dades)); }
 async function apiCrearSubtasca(dades) { return crideApi(Object.assign({ accio: "crearSubtasca" }, dades)); }
-async function apiCanviarEstat(codi, estat)       { return crideApi({ accio: "canviarEstat", codi, estat }); }
-async function apiCanviarDataFi(codi, data_fi)         { return crideApi({ accio: "canviarDataFi", codi, data_fi }); }
-async function apiCanviarParticipants(codi, participants) { return crideApi({ accio: "canviarParticipants", codi, participants }); }
-async function apiCanviarProjecte(codi, projecte)        { return crideApi({ accio: "canviarProjecte", codi, projecte }); }
+async function apiCanviarEstat(codi, estat)   { return crideApi({ accio: "canviarEstat", codi, estat }); }
+async function apiActualitzarTasca(codi, dades) { return crideApi(Object.assign({ accio: "actualitzarTasca", codi }, dades)); }
+async function apiCanviarEnllacos(codi, enllacos) { return crideApi({ accio: "canviarEnllacos", codi, enllacos }); }
 async function apiArxivarTasca(codi)   { return crideApi({ accio: "arxivarTasca", codi }); }
 
 // ============================================================
@@ -351,6 +350,7 @@ function crearTargetaKanban(t) {
   div.innerHTML = `
     ${t.projecte ? `<div class="badge-projecte">${escHtml(t.projecte)}</div>` : ""}
     <div class="targeta-titol">${escHtml(t.tasca)}</div>
+    ${t.descripcio ? `<div class="targeta-descripcio">${escHtml(t.descripcio.length > 100 ? t.descripcio.slice(0, 100) + "…" : t.descripcio)}</div>` : ""}
     <div class="targeta-meta">
       <div class="targeta-meta-fila"><span>Creador/a:</span> <strong>${escHtml(t.creador)}</strong></div>
       <div class="targeta-meta-fila"><span>Responsable:</span>
@@ -655,6 +655,25 @@ async function carregarIRenderitzarAvisos() {
 // MODAL DE DETALL DE TASCA
 // ============================================================
 
+function renderitzarEnllacos(codi, enllacos) {
+  let llista = [];
+  try { llista = JSON.parse(enllacos || "[]"); } catch (_) {}
+  if (!Array.isArray(llista) || llista.length === 0) {
+    return `<div class="modal-sense-data">Cap document enllaçat</div>`;
+  }
+  return llista.map((e, i) => `
+    <div class="modal-enllac-item">
+      <a href="${escHtml(e.url)}" target="_blank" rel="noopener" class="modal-enllac-link">${escHtml(e.nom || e.url)}</a>
+      <button class="btn btn-petit btn-perill" type="button" data-idx="${i}" data-codi="${escHtml(codi)}">✕</button>
+    </div>`).join("");
+}
+
+function obtenirEnllacosTasca(codi) {
+  const t = App.tasques.find(t => t.codi === codi);
+  if (!t || !t.enllacos) return [];
+  try { return JSON.parse(t.enllacos); } catch (_) { return []; }
+}
+
 function obrirModalTasca(codi) {
   const t = App.tasques.find(t => t.codi === codi);
   if (!t) return;
@@ -688,52 +707,84 @@ function obrirModalTasca(codi) {
 
   contingut.innerHTML = `
     <div class="modal-codi">${escHtml(t.codi)}</div>
-    <div class="modal-titol">${escHtml(t.tasca)}</div>
+    <input type="text" id="modal-inp-tasca" class="modal-inp-titol"
+           value="${escHtml(t.tasca)}" maxlength="300" required/>
+
     <div class="modal-info-grid">
-      <div class="modal-info-grup"><span class="modal-info-label">Creador/a</span><span class="modal-info-valor">${escHtml(t.creador)}</span></div>
-      <div class="modal-info-grup"><span class="modal-info-label">Responsable</span>
-        <span class="modal-info-valor"><span class="xip-responsable xip-responsable-${escHtml(t.responsable)}">${escHtml(t.responsable)}</span></span></div>
-      <div class="modal-info-grup"><span class="modal-info-label">Inici</span><span class="modal-info-valor">${escHtml(formatarData(t.data_inici))}</span></div>
+      <div class="modal-info-grup">
+        <span class="modal-info-label">Creador/a</span>
+        <span class="modal-info-valor">${escHtml(t.creador)}</span>
+      </div>
+      <div class="modal-info-grup">
+        <span class="modal-info-label">Responsable</span>
+        <select id="modal-inp-responsable" class="inp-select">
+          ${MEMBRES.map(m => `<option value="${escHtml(m)}"${t.responsable===m?" selected":""}>${escHtml(m)}</option>`).join("")}
+        </select>
+      </div>
+      <div class="modal-info-grup">
+        <span class="modal-info-label">Inici</span>
+        <span class="modal-info-valor">${escHtml(formatarData(t.data_inici))}</span>
+      </div>
       <div class="modal-info-grup">
         <span class="modal-info-label">Fi${estaVencuda(t) ? ' <span class="badge-vencuda">Endarrerida</span>' : ""}</span>
-        <div class="modal-data-edit">
-          <input type="date" class="inp-data" id="modal-inp-data-fi" value="${escHtml(t.data_fi || "")}"/>
-          <button class="btn btn-petit btn-primari" id="btn-guardar-data-fi" data-codi="${escHtml(t.codi)}">Guardar</button>
-        </div>
+        <input type="date" class="inp-data" id="modal-inp-data-fi" value="${escHtml(t.data_fi || "")}"/>
       </div>
-      <div class="modal-info-grup"><span class="modal-info-label">Tipus</span><span class="modal-info-valor">${escHtml(t.tipus)}</span></div>
-      <div class="modal-info-grup"><span class="modal-info-label">Prioritat</span><span class="modal-info-valor">${escHtml(t.prioritat)}</span></div>
+      <div class="modal-info-grup">
+        <span class="modal-info-label">Tipus</span>
+        <span class="modal-info-valor">${escHtml(t.tipus)}</span>
+      </div>
+      <div class="modal-info-grup">
+        <span class="modal-info-label">Prioritat</span>
+        <span class="modal-info-valor">${escHtml(t.prioritat)}</span>
+      </div>
       <div class="modal-info-grup" style="grid-column:span 2">
         <span class="modal-info-label">Projecte</span>
         <div class="modal-data-edit">
           <select class="inp-select" id="modal-inp-projecte">
             <option value="">— Sense projecte —</option>
-            ${PROJECTES.map(p => `<option value="${escHtml(p)}"${t.projecte === p ? " selected" : ""}>${escHtml(p)}</option>`).join("")}
+            ${PROJECTES.map(p => `<option value="${escHtml(p)}"${t.projecte===p?" selected":""}>${escHtml(p)}</option>`).join("")}
             ${t.projecte && !PROJECTES.includes(t.projecte) ? `<option value="${escHtml(t.projecte)}" selected>${escHtml(t.projecte)}</option>` : ""}
             <option value="__nou__">➕ Projecte nou…</option>
           </select>
-          <input type="text" id="modal-inp-projecte-nou" class="inp-tasca" placeholder="Nom del projecte…" maxlength="60" style="display:none;max-width:160px"/>
-          <button class="btn btn-petit btn-primari" id="btn-guardar-projecte">Guardar</button>
+          <input type="text" id="modal-inp-projecte-nou" class="inp-tasca"
+                 placeholder="Nom del projecte…" maxlength="60" style="display:none;max-width:160px"/>
         </div>
       </div>
-      ${t.origen_doc_titol ? `<div class="modal-info-grup" style="grid-column:span 2"><span class="modal-info-label">Origen</span><span class="modal-info-valor">${escHtml(t.origen_doc_titol)}</span></div>` : ""}
-      ${esSubtasca && t.parent_id ? `<div class="modal-info-grup" style="grid-column:span 2"><span class="modal-info-label">Tasca mare</span>
-        <span class="modal-info-valor" style="cursor:pointer;color:var(--color-primari)" data-nav-codi="${escHtml(t.parent_id)}">${escHtml(t.parent_id)}</span></div>` : ""}
+      ${t.origen_doc_titol ? `<div class="modal-info-grup" style="grid-column:span 2">
+        <span class="modal-info-label">Origen</span>
+        <span class="modal-info-valor">${escHtml(t.origen_doc_titol)}</span>
+      </div>` : ""}
+      ${esSubtasca && t.parent_id ? `<div class="modal-info-grup" style="grid-column:span 2">
+        <span class="modal-info-label">Tasca mare</span>
+        <span class="modal-info-valor" style="cursor:pointer;color:var(--color-primari)"
+              data-nav-codi="${escHtml(t.parent_id)}">${escHtml(t.parent_id)}</span>
+      </div>` : ""}
     </div>
+
     <div class="modal-seccio-titol">Participants addicionals</div>
     <div class="modal-participants">
-      ${MEMBRES.filter(m => m !== t.responsable).map(m => {
+      ${MEMBRES.map(m => {
         const actiu = llistarParticipants(t).includes(m);
-        return `<label class="participant-label">
-          <input type="checkbox" class="part-check" value="${escHtml(m)}" ${actiu ? "checked" : ""}/>
+        return `<label class="participant-label"${m === t.responsable ? ' style="display:none"' : ""}>
+          <input type="checkbox" class="part-check" value="${escHtml(m)}"${actiu ? " checked" : ""}/>
           <span class="xip-responsable xip-responsable-${escHtml(m)}">${escHtml(m)}</span>
         </label>`;
       }).join("")}
-      <button class="btn btn-petit btn-secundari" id="btn-guardar-participants">Guardar</button>
     </div>
+
+    <div class="modal-seccio-titol">Descripció</div>
+    <textarea id="modal-inp-descripcio" class="modal-textarea"
+              placeholder="Descripció opcional de la tasca…"
+              maxlength="2000" rows="3">${escHtml(t.descripcio || "")}</textarea>
+
+    <div class="modal-accions-guardar">
+      <button class="btn btn-primari" id="btn-guardar-tot">Guardar canvis</button>
+    </div>
+
     <div class="modal-seccio-titol">Estat</div>
     <div class="modal-accions-estat">${btnsEstat}</div>
     ${progresHtml}
+
     ${!esSubtasca ? `
     <div class="modal-seccio-titol">Subtasques</div>
     <div class="modal-subtasques-llista">${subsHtml}</div>
@@ -742,11 +793,23 @@ function obrirModalTasca(codi) {
       <input type="text" class="inp-tasca" id="sub-inp-tasca" placeholder="Nova subtasca…" required maxlength="300"/>
       <select class="inp-select" id="sub-inp-responsable" required>
         <option value="">Responsable</option>
-        ${MEMBRES.map(m=>`<option value="${escHtml(m)}">${escHtml(m)}</option>`).join("")}
+        ${MEMBRES.map(m => `<option value="${escHtml(m)}">${escHtml(m)}</option>`).join("")}
       </select>
       <input type="date" class="inp-data" id="sub-inp-data-fi" required/>
       <button type="submit" class="btn btn-primari btn-petit">+ Afegir</button>
     </form>` : ""}
+
+    <div class="modal-seccio-titol">Documents i enllaços</div>
+    <div id="modal-enllacos-llista" class="modal-enllacos-llista">
+      ${renderitzarEnllacos(t.codi, t.enllacos)}
+    </div>
+    <form class="modal-afegir-enllac" id="form-afegir-enllac" autocomplete="off">
+      <input type="text" id="modal-inp-url" class="inp-tasca" placeholder="URL del document…" maxlength="1000"/>
+      <input type="text" id="modal-inp-url-nom" class="inp-tasca"
+             placeholder="Nom (opcional)" maxlength="100" style="max-width:180px"/>
+      <button type="submit" class="btn btn-petit btn-secundari">+ Afegir</button>
+    </form>
+
     <div class="modal-accio-arxivar">
       <button class="btn btn-perill btn-petit" id="btn-arxivar-modal" data-codi="${escHtml(t.codi)}">Arxivar tasca</button>
     </div>`;
@@ -759,28 +822,43 @@ function obrirModalTasca(codi) {
   contingut.querySelectorAll(".modal-accions-estat .btn").forEach(btn => {
     btn.addEventListener("click", () => accionarCanviEstat(btn.dataset.codi, btn.dataset.estat));
   });
+
   const selModalProj = document.getElementById("modal-inp-projecte");
   selModalProj?.addEventListener("change", () => {
-    const nouEl = document.getElementById("modal-inp-projecte-nou");
-    nouEl.style.display = selModalProj.value === "__nou__" ? "block" : "none";
+    document.getElementById("modal-inp-projecte-nou").style.display =
+      selModalProj.value === "__nou__" ? "block" : "none";
   });
-  document.getElementById("btn-guardar-projecte")?.addEventListener("click", async () => {
-    let projecte = selModalProj?.value ?? "";
-    if (projecte === "__nou__") projecte = document.getElementById("modal-inp-projecte-nou")?.value.trim() ?? "";
-    await accionarCanviarProjecte(t.codi, projecte);
+
+  const selResp = document.getElementById("modal-inp-responsable");
+  selResp?.addEventListener("change", () => {
+    const newResp = selResp.value;
+    MEMBRES.forEach(m => {
+      const label = contingut.querySelector(`.part-check[value="${m}"]`)?.closest(".participant-label");
+      if (!label) return;
+      if (m === newResp) { label.style.display = "none"; label.querySelector(".part-check").checked = false; }
+      else { label.style.display = ""; }
+    });
   });
-  document.getElementById("btn-guardar-participants")?.addEventListener("click", async () => {
-    const checks = contingut.querySelectorAll(".part-check:checked");
-    const participants = Array.from(checks).map(c => c.value).join(",");
-    await accionarActualitzarParticipants(t.codi, participants);
+
+  document.getElementById("btn-guardar-tot")?.addEventListener("click", () => accionarGuardarTot(t.codi));
+
+  document.getElementById("modal-enllacos-llista")?.addEventListener("click", async e => {
+    const btn = e.target.closest("button[data-idx]");
+    if (!btn) return;
+    await accionarEliminarEnllac(btn.dataset.codi, parseInt(btn.dataset.idx, 10));
   });
-  document.getElementById("btn-guardar-data-fi")?.addEventListener("click", async () => {
-    const novaData = document.getElementById("modal-inp-data-fi")?.value;
-    if (!novaData) { mostrarBanner("Selecciona una data de fi vàlida.", "error", 3000); return; }
-    await accionarCanviarDataFi(t.codi, novaData);
+
+  document.getElementById("form-afegir-enllac")?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const url = document.getElementById("modal-inp-url")?.value?.trim();
+    const nom = document.getElementById("modal-inp-url-nom")?.value?.trim();
+    if (!url) { mostrarBanner("Cal introduir una URL.", "error", 3000); return; }
+    await accionarAfegirEnllac(t.codi, nom, url);
   });
+
   const formSub = document.getElementById("form-nova-subtasca");
   if (formSub) formSub.addEventListener("submit", async e => { e.preventDefault(); await accionarCrearSubtasca(formSub.dataset.parent); });
+
   document.getElementById("btn-arxivar-modal")?.addEventListener("click", async () => {
     if (!confirm(`Arxivar la tasca "${t.tasca}"?`)) return;
     await accionarArxivar(t.codi);
@@ -819,34 +897,55 @@ async function accionarCrearSubtasca(parentId) {
   await carregarTasques();
 }
 
-async function accionarCanviarProjecte(codi, projecte) {
+async function accionarGuardarTot(codi) {
+  const tasca       = document.getElementById("modal-inp-tasca")?.value?.trim();
+  const responsable = document.getElementById("modal-inp-responsable")?.value;
+  const data_fi     = document.getElementById("modal-inp-data-fi")?.value;
+  const descripcio  = document.getElementById("modal-inp-descripcio")?.value?.trim() ?? "";
+
+  let projecte = document.getElementById("modal-inp-projecte")?.value ?? "";
+  if (projecte === "__nou__") {
+    projecte = document.getElementById("modal-inp-projecte-nou")?.value?.trim() ?? "";
+  }
+
+  const checks = document.getElementById("modal-contingut").querySelectorAll(".part-check:checked");
+  const participants = Array.from(checks).map(c => c.value).filter(p => p !== responsable).join(",");
+
+  if (!tasca)   { mostrarBanner("El nom de la tasca no pot ser buit.", "error", 3000); return; }
+  if (!data_fi) { mostrarBanner("La data de fi és obligatòria.", "error", 3000); return; }
+
   mostrarCarregant(true);
-  const r = await apiCanviarProjecte(codi, projecte);
+  const r = await apiActualitzarTasca(codi, { tasca, responsable, data_fi, participants, projecte, descripcio });
   mostrarCarregant(false);
   if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
-  mostrarBanner("Projecte actualitzat.", "ok");
+  mostrarBanner("Tasca actualitzada.", "ok");
   tancarModal();
   await carregarTasques();
 }
 
-async function accionarActualitzarParticipants(codi, participants) {
+async function accionarAfegirEnllac(codi, nom, url) {
+  const llista = obtenirEnllacosTasca(codi);
+  llista.push({ nom: nom || url, url });
   mostrarCarregant(true);
-  const r = await apiCanviarParticipants(codi, participants);
+  const r = await apiCanviarEnllacos(codi, JSON.stringify(llista));
   mostrarCarregant(false);
   if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
-  mostrarBanner("Participants actualitzats.", "ok");
-  tancarModal();
+  mostrarBanner("Enllaç afegit.", "ok", 2000);
   await carregarTasques();
+  obrirModalTasca(codi);
 }
 
-async function accionarCanviarDataFi(codi, data_fi) {
+async function accionarEliminarEnllac(codi, idx) {
+  const llista = obtenirEnllacosTasca(codi);
+  if (idx < 0 || idx >= llista.length) return;
+  llista.splice(idx, 1);
   mostrarCarregant(true);
-  const r = await apiCanviarDataFi(codi, data_fi);
+  const r = await apiCanviarEnllacos(codi, JSON.stringify(llista));
   mostrarCarregant(false);
   if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
-  mostrarBanner("Data de fi actualitzada.", "ok");
-  tancarModal();
+  mostrarBanner("Enllaç eliminat.", "ok", 2000);
   await carregarTasques();
+  obrirModalTasca(codi);
 }
 
 async function accionarArxivar(codi) {
@@ -894,8 +993,10 @@ function configurarEventos() {
     let projecte = document.getElementById("inp-projecte").value;
     if (projecte === "__nou__") projecte = document.getElementById("inp-projecte-nou").value.trim();
 
+    const descripcio = document.getElementById("inp-descripcio")?.value?.trim() ?? "";
+
     mostrarCarregant(true);
-    const r = await apiCrearTasca({ tasca, responsable, data_fi, projecte });
+    const r = await apiCrearTasca({ tasca, responsable, data_fi, projecte, descripcio });
     mostrarCarregant(false);
     if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
     mostrarBanner(`Tasca creada correctament (${r.codi}).`, "ok");

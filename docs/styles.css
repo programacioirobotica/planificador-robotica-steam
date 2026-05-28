@@ -805,6 +805,116 @@ a { color: var(--color-primari); }
   outline-offset: -2px;
 }
 
+/* ---------- MODAL: TÍTOL EDITABLE ---------- */
+.modal-inp-titol {
+  display: block;
+  width: 100%;
+  font-size: 20px;
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  border-radius: var(--radi);
+  padding: 4px 8px;
+  margin-bottom: 14px;
+  padding-right: 30px;
+  background: transparent;
+  font-family: inherit;
+  color: var(--color-text);
+  transition: var(--transicio);
+}
+.modal-inp-titol:hover { border-color: var(--color-vora); background: var(--color-fons); }
+.modal-inp-titol:focus { outline: none; border-color: var(--color-primari); background: var(--color-fons); box-shadow: 0 0 0 3px rgba(59,110,232,.15); }
+
+/* ---------- MODAL: TEXTAREA DESCRIPCIÓ ---------- */
+.modal-textarea {
+  display: block;
+  width: 100%;
+  padding: 9px 13px;
+  border: 1.5px solid #c2cef0;
+  border-radius: var(--radi);
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--color-text);
+  resize: vertical;
+  min-height: 60px;
+  transition: var(--transicio);
+  margin-bottom: 12px;
+}
+.modal-textarea:focus { outline: none; border-color: var(--color-primari); box-shadow: 0 0 0 3px rgba(59,110,232,.15); }
+
+/* ---------- MODAL: BOTÓ GLOBAL GUARDAR ---------- */
+.modal-accions-guardar {
+  margin: 4px 0 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- MODAL: SECCIÓ DOCUMENTS I ENLLAÇOS ---------- */
+.modal-enllacos-llista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  min-height: 10px;
+}
+.modal-enllac-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--color-fons);
+  border-radius: var(--radi);
+  border: 1px solid var(--color-vora);
+}
+.modal-enllac-link {
+  flex: 1;
+  font-size: 13px;
+  color: var(--color-primari);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.modal-enllac-link:hover { text-decoration: underline; }
+.modal-afegir-enllac {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.modal-afegir-enllac .inp-tasca { min-width: 150px; }
+.modal-sense-data {
+  font-size: 13px;
+  color: var(--color-text-suau);
+  padding: 4px 0 8px;
+}
+
+/* ---------- TARGETA: DESCRIPCIÓ ---------- */
+.targeta-descripcio {
+  font-size: 11px;
+  color: var(--color-text-suau);
+  margin-bottom: 6px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* ---------- FORMULARI: CAMP DESCRIPCIÓ ---------- */
+.inp-descripcio {
+  flex: 0 0 100%;
+  padding: 7px 13px;
+  border: 1.5px solid #c2cef0;
+  border-radius: var(--radi);
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--color-text);
+  resize: vertical;
+  min-height: 50px;
+  transition: var(--transicio);
+}
+.inp-descripcio:focus { outline: none; border-color: var(--color-primari); box-shadow: 0 0 0 3px rgba(59,110,232,.15); }
+
 /* ---------- BUIT / SENSE DADES ---------- */
 .estat-buit {
   text-align: center;
