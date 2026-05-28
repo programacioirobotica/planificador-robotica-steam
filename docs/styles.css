@@ -902,16 +902,17 @@ a { color: var(--color-primari); }
 /* ---------- FORMULARI: CAMP DESCRIPCIÓ ---------- */
 .inp-descripcio {
   flex: 0 0 100%;
-  padding: 7px 13px;
+  padding: 9px 13px;
   border: 1.5px solid #c2cef0;
   border-radius: var(--radi);
-  font-size: 13px;
+  font-size: 14px;
   font-family: inherit;
   background: #fff;
   color: var(--color-text);
-  resize: vertical;
-  min-height: 50px;
+  resize: none;
+  height: 60px;
   transition: var(--transicio);
+  line-height: 1.5;
 }
 .inp-descripcio:focus { outline: none; border-color: var(--color-primari); box-shadow: 0 0 0 3px rgba(59,110,232,.15); }
 
