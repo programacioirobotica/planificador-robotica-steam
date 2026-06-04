@@ -693,9 +693,10 @@ function obrirModalTasca(codi) {
     ? subs.map(s => `
         <div class="modal-subtasca-item">
           <div class="subtasca-estat-dot dot-${escHtml(s.estat.replace(" ","."))}"></div>
-          <span class="modal-subtasca-nom">${escHtml(s.tasca)}</span>
+          <input type="text" class="modal-sub-nom" value="${escHtml(s.tasca)}" maxlength="300"/>
           <span class="modal-subtasca-resp">${escHtml(s.responsable)}</span>
-          <span class="modal-subtasca-resp">Fi: ${escHtml(formatarData(s.data_fi))}</span>
+          <input type="date" class="modal-sub-data" value="${escHtml(s.data_fi || "")}"/>
+          <button class="btn btn-petit btn-primari modal-sub-guardar" data-codi="${escHtml(s.codi)}" type="button">Guardar</button>
         </div>`).join("")
     : `<div style="font-size:13px;color:var(--color-text-suau)">Cap subtasca</div>`;
 
@@ -854,6 +855,23 @@ function obrirModalTasca(codi) {
     const nom = document.getElementById("modal-inp-url-nom")?.value?.trim();
     if (!url) { mostrarBanner("Cal introduir una URL.", "error", 3000); return; }
     await accionarAfegirEnllac(t.codi, nom, url);
+  });
+
+  contingut.querySelector(".modal-subtasques-llista")?.addEventListener("click", async e => {
+    const btn = e.target.closest(".modal-sub-guardar");
+    if (!btn) return;
+    const fila = btn.closest(".modal-subtasca-item");
+    const tasca   = fila?.querySelector(".modal-sub-nom")?.value?.trim();
+    const data_fi = fila?.querySelector(".modal-sub-data")?.value;
+    if (!tasca)   { mostrarBanner("El nom de la subtasca no pot ser buit.", "error", 3000); return; }
+    if (!data_fi) { mostrarBanner("La data de fi és obligatòria.", "error", 3000); return; }
+    mostrarCarregant(true);
+    const r = await apiActualitzarTasca(btn.dataset.codi, { tasca, data_fi });
+    mostrarCarregant(false);
+    if (!r.ok) { mostrarBanner(`Error: ${r.error}`, "error"); return; }
+    mostrarBanner("Subtasca actualitzada.", "ok", 2000);
+    await carregarTasques();
+    obrirModalTasca(t.codi);
   });
 
   const formSub = document.getElementById("form-nova-subtasca");

@@ -704,6 +704,21 @@ a { color: var(--color-primari); }
 .modal-subtasca-item:last-child { border-bottom: none; }
 .modal-subtasca-nom { flex: 1; }
 .modal-subtasca-resp { font-size: 11px; color: var(--color-text-suau); }
+.modal-sub-nom, .modal-sub-data {
+  border: 1.5px solid #c2cef0;
+  border-radius: var(--radi);
+  font-family: inherit;
+  background: #fff;
+  color: var(--color-text);
+  transition: var(--transicio);
+}
+.modal-sub-nom:focus, .modal-sub-data:focus {
+  outline: none;
+  border-color: var(--color-primari);
+  box-shadow: 0 0 0 2px rgba(59,110,232,.15);
+}
+.modal-sub-nom  { flex: 1; min-width: 80px; padding: 4px 8px; font-size: 12px; }
+.modal-sub-data { width: 130px; padding: 4px 6px; font-size: 12px; }
 
 .form-subtasca {
   display: flex;
