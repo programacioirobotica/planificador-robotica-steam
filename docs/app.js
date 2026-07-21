@@ -509,7 +509,7 @@ function renderitzarPerPersona() {
       <div class="persona-cap">
         <div class="persona-avatar avatar-${escHtml(membre)}">${ini[membre]||membre.slice(0,2).toUpperCase()}</div>
         <span class="persona-nom">${escHtml(membre)}</span>
-        <span class="persona-recompte">${tt.length} tasca${tt.length!==1?"s":""} activa${tt.length!==1?"s":""}</span>
+        <span class="persona-recompte">${tt.length} ${tt.length!==1?"tasques actives":"tasca activa"}</span>
       </div>
       <div class="persona-tasques">
         ${tt.length === 0
@@ -570,7 +570,7 @@ function renderitzarPerProjecte() {
     <div class="persona-grup">
       <div class="persona-cap">
         <span class="badge-projecte" style="font-size:13px;padding:3px 10px">${escHtml(nom)}</span>
-        <span class="persona-recompte">${tt.length} tasca${tt.length !== 1 ? "s" : ""}</span>
+        <span class="persona-recompte">${tt.length} ${tt.length !== 1 ? "tasques" : "tasca"}</span>
       </div>
       <div class="persona-tasques">${files}</div>
     </div>`;
