@@ -329,6 +329,7 @@ a { color: var(--color-primari); }
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-wrap: wrap; /* permet que el badge "Endarrerida" passi a la línia següent en lloc de desbordar */
   font-size: 11px;
   color: var(--color-text-suau);
 }
