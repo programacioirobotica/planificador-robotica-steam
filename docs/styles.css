@@ -824,6 +824,8 @@ a { color: var(--color-primari); }
   letter-spacing: .4px;
   vertical-align: middle;
 }
+/* Badge "Endarrerida" col·locat a dalt de tot de la targeta */
+.targeta-vencuda-top { margin-bottom: 8px; }
 .data-vencuda { color: var(--color-perill); font-weight: 600; }
 .gantt-barra--vencuda {
   outline: 2px solid var(--color-perill);
