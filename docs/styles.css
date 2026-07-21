@@ -140,6 +140,10 @@ a { color: var(--color-primari); }
 }
 .capcalera .btn-accent:hover { background: rgba(255,255,255,.28); }
 
+/* Enllaç "Pla de treball 26-27" a la capçalera (es mostra com un botó) */
+.capcalera a.btn { text-decoration: none; }
+.btn-pla-treball { margin-left: 2px; }
+
 /* ---------- BANNER D'ESTAT ---------- */
 .banner-estat {
   padding: 10px 24px;
@@ -239,21 +243,25 @@ a { color: var(--color-primari); }
 /* ---------- KANBAN ---------- */
 .kanban {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* minmax(0, 1fr): força que les 4 columnes tinguin SEMPRE el mateix ample,
+     independentment del contingut de les targetes (1fr sol té un mínim
+     implícit de min-content que eixamplava les columnes amb text llarg) */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   align-items: start;
 }
 @media (max-width: 900px) {
-  .kanban { grid-template-columns: repeat(2, 1fr); }
+  .kanban { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 520px) {
-  .kanban { grid-template-columns: 1fr; }
+  .kanban { grid-template-columns: minmax(0, 1fr); }
 }
 
 .kanban-col {
   border-radius: var(--radi-gran);
   padding: 12px;
   min-height: 200px;
+  min-width: 0; /* imprescindible perquè la columna pugui encongir i totes siguin iguals */
 }
 .kanban-col[data-estat="Pendent"]   { background: var(--color-col-pendent); }
 .kanban-col[data-estat="En curs"]   { background: var(--color-col-en-curs); }
@@ -309,6 +317,7 @@ a { color: var(--color-primari); }
   font-weight: 600;
   margin-bottom: 6px;
   line-height: 1.4;
+  overflow-wrap: anywhere; /* trenca paraules/codis molt llargs perquè no eixamplin la targeta */
 }
 .targeta-meta {
   display: flex;
