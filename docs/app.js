@@ -348,6 +348,7 @@ function crearTargetaKanban(t) {
     .join("");
 
   div.innerHTML = `
+    ${vencuda ? '<div class="targeta-vencuda-top"><span class="badge-vencuda">Endarrerida</span></div>' : ""}
     ${t.projecte ? `<div class="badge-projecte">${escHtml(t.projecte)}</div>` : ""}
     <div class="targeta-titol">${escHtml(t.tasca)}</div>
     ${t.descripcio ? `<div class="targeta-descripcio">${escHtml(t.descripcio.length > 100 ? t.descripcio.slice(0, 100) + "…" : t.descripcio)}</div>` : ""}
@@ -359,7 +360,6 @@ function crearTargetaKanban(t) {
       <div class="targeta-meta-fila">
         <span>Inici:</span> ${escHtml(formatarData(t.data_inici))} &nbsp;·&nbsp;
         <span>Fi:</span> <span class="${vencuda ? "data-vencuda" : ""}">${escHtml(formatarData(t.data_fi))}</span>
-        ${vencuda ? '<span class="badge-vencuda">Endarrerida</span>' : ""}
       </div>
       ${llistarParticipants(t).length > 0 ? `
       <div class="targeta-meta-fila">
