@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pla de treball · Curs 2026–2027 · Equip Robòtica i STEAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16182E;
+    --ink-soft:#4A4D6B;
+    --paper:#F6F4EF;
+    --card:#FFFFFF;
+    --line:#E4E0D6;
+
+    --steam-s:#0FB5A6; /* teal */
+    --steam-t:#3B5BDB; /* blau */
+    --steam-e:#F0A020; /* ambre */
+    --steam-a:#E8537A; /* coral */
+    --steam-m:#7C5CDB; /* violeta */
+
+    --o1:#7C5CDB;
+    --o2:#F0A020;
+    --o3:#0FB5A6;
+    --o4:#3B5BDB;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:clamp(20px,4vw,64px) clamp(16px,4vw,48px);
+  }
+
+  .wrap{max-width:1080px;margin:0 auto}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    border:1.5px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:20px;
+    padding:clamp(26px,4vw,48px);
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.06) 1.2px, transparent 1.2px);
+    background-size:22px 22px;
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:500;
+    font-size:.72rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:#B9BEE6;
+    position:relative;z-index:1;
+  }
+  .hero h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:clamp(2.1rem,6vw,3.9rem);
+    line-height:1.02;
+    letter-spacing:-.02em;
+    margin:.5rem 0 .1rem;
+    position:relative;z-index:1;
+  }
+  .hero h1 .yr{color:#8E93C8;font-weight:600}
+  .hero .lede{
+    position:relative;z-index:1;
+    color:#D7DAF0;
+    font-size:clamp(.95rem,2vw,1.08rem);
+    max-width:44ch;
+    margin-top:.4rem;
+  }
+
+  /* STEAM logotype */
+  .steam{
+    display:flex;gap:clamp(10px,1.6vw,16px);flex-wrap:wrap;align-items:center;
+    margin-top:clamp(22px,3.4vw,34px);
+    position:relative;z-index:1;
+    --logo:clamp(46px,8vw,62px);
+  }
+  .steam-lead{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:calc(var(--logo) * 1.3);
+    line-height:1;
+    letter-spacing:-.03em;
+    background:linear-gradient(100deg,var(--steam-s),var(--steam-t) 32%,var(--steam-e) 56%,var(--steam-a) 80%,var(--steam-m));
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+  }
+  .steam-lead .i{
+    -webkit-text-fill-color:#8E93C8;color:#8E93C8;
+    font-style:italic;font-weight:500;
+    font-size:.52em;
+    padding:0 .08em 0 .16em;
+  }
+  .tiles{display:flex;gap:8px;flex-wrap:wrap}
+  .tiles .tile{
+    width:var(--logo);
+    height:var(--logo);
+    border-radius:12px;
+    display:grid;place-items:center;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:calc(var(--logo) * 0.56);
+    color:#16182E;
+  }
+  .tiles .tile:nth-child(1){background:var(--steam-s)}
+  .tiles .tile:nth-child(2){background:var(--steam-t);color:#fff}
+  .tiles .tile:nth-child(3){background:var(--steam-e)}
+  .tiles .tile:nth-child(4){background:var(--steam-a);color:#fff}
+  .tiles .tile:nth-child(5){background:var(--steam-m);color:#fff}
+
+  /* ---------- GRID ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:clamp(16px,2.2vw,22px);
+    margin-top:clamp(16px,2.2vw,22px);
+  }
+  .full{grid-column:1 / -1}
+
+  .card{
+    background:var(--card);
+    border:1.5px solid var(--line);
+    border-top:5px solid var(--accent);
+    border-radius:16px;
+    padding:clamp(20px,2.6vw,30px);
+    display:flex;flex-direction:column;
+  }
+
+  .card-head{
+    display:flex;align-items:baseline;gap:14px;
+    padding-bottom:16px;margin-bottom:18px;
+    border-bottom:1px dashed var(--line);
+  }
+  .num{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:600;
+    font-size:.82rem;
+    color:#fff;background:var(--accent);
+    padding:5px 9px;border-radius:8px;
+    letter-spacing:.06em;flex:none;
+  }
+  .card-head h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:clamp(1.25rem,2.6vw,1.6rem);
+    letter-spacing:-.01em;
+    line-height:1.1;
+  }
+  .card-head .tag{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:500;font-size:.68rem;
+    letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:3px;
+  }
+
+  /* groups inside a card */
+  .groups{
+    display:grid;gap:clamp(16px,2vw,26px);
+  }
+  .groups.cols-3{grid-template-columns:repeat(3,1fr)}
+  .group > .glabel{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;font-size:.98rem;
+    color:var(--accent);
+    display:flex;align-items:center;gap:8px;
+    margin-bottom:12px;
+  }
+  .group > .glabel::before{
+    content:"";width:9px;height:9px;flex:none;
+    background:var(--accent);
+    border-radius:3px;
+    transform:rotate(45deg);
+  }
+
+  ul{list-style:none}
+  li{
+    position:relative;
+    padding-left:22px;
+    margin-bottom:9px;
+    font-size:.94rem;
+    color:var(--ink);
+  }
+  li:last-child{margin-bottom:0}
+  li::before{
+    content:"";
+    position:absolute;left:2px;top:.5em;
+    width:8px;height:8px;
+    border:1.6px solid var(--accent);
+    border-radius:2px;
+  }
+
+  /* count chip */
+  .count{
+    margin-left:auto;flex:none;align-self:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.66rem;letter-spacing:.08em;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    padding:3px 8px;border-radius:20px;
+    white-space:nowrap;
+  }
+
+  footer{
+    margin-top:clamp(20px,3vw,32px);
+    display:flex;justify-content:space-between;
+    flex-wrap:wrap;gap:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+
+  /* entrance */
+  @media (prefers-reduced-motion:no-preference){
+    .card,.hero{animation:rise .55s cubic-bezier(.2,.7,.2,1) both}
+    .card:nth-child(1){animation-delay:.05s}
+    .card:nth-child(2){animation-delay:.1s}
+    .card:nth-child(3){animation-delay:.15s}
+    .card:nth-child(4){animation-delay:.2s}
+    @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  }
+
+  @media (max-width:720px){
+    .grid{grid-template-columns:1fr}
+    .groups.cols-3{grid-template-columns:1fr}
+  }
+
+  @media print{
+    body{background:#fff;padding:0}
+    .hero,.card{break-inside:avoid}
+    .card,.hero{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Equip Robòtica i STEAM</div>
+    <h1>Pla de treball<br><span class="yr">Curs 2026–2027</span></h1>
+    <p class="lede">Objectius del curs.</p>
+    <div class="steam" aria-label="Robòtica i STEAM">
+      <span class="steam-lead">Robòtica<span class="i">i</span></span>
+      <div class="tiles">
+        <span class="tile">S</span>
+        <span class="tile">T</span>
+        <span class="tile">E</span>
+        <span class="tile">A</span>
+        <span class="tile">M</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="grid">
+
+    <!-- OBJECTIU 1 -->
+    <section class="card" style="--accent:var(--o1)">
+      <div class="card-head">
+        <span class="num">01</span>
+        <div>
+          <span class="tag">CDA i PC</span>
+          <h2>Seqüenciació del pensament computacional</h2>
+        </div>
+        <span class="count">1 tasca</span>
+      </div>
+      <div class="groups">
+        <div class="group">
+          <div class="glabel">Document de seqüenciació</div>
+          <ul>
+            <li>Acabar el document</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- OBJECTIU 2 -->
+    <section class="card" style="--accent:var(--o2)">
+      <div class="card-head">
+        <span class="num">02</span>
+        <div>
+          <span class="tag">Formació</span>
+          <h2>Jornades</h2>
+        </div>
+        <span class="count">3 jornades</span>
+      </div>
+      <div class="groups">
+        <div class="group">
+          <div class="glabel">Programa de jornades</div>
+          <ul>
+            <li>XIX edició de la JPRE</li>
+            <li>Jornada STEM a l'espai</li>
+            <li>eXploraSTEAM</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- OBJECTIU 3 -->
+    <section class="card full" style="--accent:var(--o3)">
+      <div class="card-head">
+        <span class="num">03</span>
+        <div>
+          <span class="tag">Recursos PC</span>
+          <h2>Robots, suport i propostes didàctiques</h2>
+        </div>
+        <span class="count">9 propostes</span>
+      </div>
+      <div class="groups cols-3">
+        <div class="group">
+          <div class="glabel">Robots en acció</div>
+          <ul>
+            <li>Elaboració de la Temporada 3 amb enfocament STEAM</li>
+            <li>Renovació dels materials de la Temporada 1</li>
+            <li>Dinamització i suport de T1, T2 i T3</li>
+            <li>Nou espai personal</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="glabel">Espai de suport de PC i robòtica</div>
+          <ul>
+            <li>Nou apartat de fabricació digital</li>
+            <li>Ampliació del catàleg d'activitats de robòtica</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="glabel">Propostes didàctiques</div>
+          <ul>
+            <li>Nous materials de ScratchJr</li>
+            <li>Renovació dels materials de Scratch</li>
+            <li>Renovació dels materials de PC desendollat</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- OBJECTIU 4 -->
+    <section class="card full" style="--accent:var(--o4)">
+      <div class="card-head">
+        <span class="num">04</span>
+        <div>
+          <span class="tag">STEAMcat</span>
+          <h2>Programa, ecosistema i iniciatives</h2>
+        </div>
+        <span class="count">12 propostes</span>
+      </div>
+      <div class="groups cols-3">
+        <div class="group">
+          <div class="glabel">Programa STEAMcat</div>
+          <ul>
+            <li>Assessorament a centres</li>
+            <li>Comunitats</li>
+            <li>Espai de suport STEAMcat</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="glabel">Ecosistema STEAMcat</div>
+          <ul>
+            <li>Renovació de l'espai PropoSTEAM</li>
+            <li>Aules pel futur</li>
+            <li>Suport a STEMarium</li>
+          </ul>
+        </div>
+        <div class="group">
+          <div class="glabel">Iniciatives vinculades a l'espai</div>
+          <ul>
+            <li>Renovació de l'espai de suport</li>
+            <li>Edusat Challenge</li>
+            <li>Cansat</li>
+            <li>Estratègia Catalunya Espai 2030</li>
+            <li>Col·laboració amb ESERO</li>
+            <li>NUS</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Pla de treball · Curs 2026–2027</span>
+    <span>4 objectius · 25 propostes</span>
+  </footer>
+
+</div>
+</body>
+</html>
