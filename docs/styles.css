@@ -90,6 +90,54 @@ a { color: var(--color-primari); }
 .btn-estat-bloquejada{ background: #fde0e0; color: var(--color-bloquejada); }
 .btn-estat-feta      { background: #d4f5e6; color: var(--color-feta); }
 
+/* ---------- BARRA DE CALENDARI ---------- */
+.calendari-barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 6px 28px;
+  background: #eef2fd;
+  border-bottom: 1px solid #d0d9f5;
+  font-size: 12.5px;
+}
+.calendari-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primari-fosc);
+  font-weight: 600;
+  text-decoration: none;
+}
+.calendari-link:hover { text-decoration: underline; }
+
+.calendari-avis {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff6db;
+  color: #7a5c00;
+  border: 1px solid #f0dfa0;
+  border-radius: 999px;
+  padding: 3px 6px 3px 12px;
+  font-weight: 500;
+}
+.calendari-avis-tancar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 50%;
+  opacity: .6;
+}
+.calendari-avis-tancar:hover { opacity: 1; background: rgba(0,0,0,.06); }
+
 /* ---------- CAPÇALERA ---------- */
 .capcalera {
   display: flex;
@@ -139,10 +187,6 @@ a { color: var(--color-primari); }
   border: 1px solid rgba(255,255,255,.35);
 }
 .capcalera .btn-accent:hover { background: rgba(255,255,255,.28); }
-
-/* Enllaç "Pla de treball 26-27" a la capçalera (es mostra com un botó) */
-.capcalera a.btn { text-decoration: none; }
-.btn-pla-treball { margin-left: 2px; }
 
 /* ---------- BANNER D'ESTAT ---------- */
 .banner-estat {
@@ -243,25 +287,21 @@ a { color: var(--color-primari); }
 /* ---------- KANBAN ---------- */
 .kanban {
   display: grid;
-  /* minmax(0, 1fr): força que les 4 columnes tinguin SEMPRE el mateix ample,
-     independentment del contingut de les targetes (1fr sol té un mínim
-     implícit de min-content que eixamplava les columnes amb text llarg) */
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   align-items: start;
 }
 @media (max-width: 900px) {
-  .kanban { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kanban { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 520px) {
-  .kanban { grid-template-columns: minmax(0, 1fr); }
+  .kanban { grid-template-columns: 1fr; }
 }
 
 .kanban-col {
   border-radius: var(--radi-gran);
   padding: 12px;
   min-height: 200px;
-  min-width: 0; /* imprescindible perquè la columna pugui encongir i totes siguin iguals */
 }
 .kanban-col[data-estat="Pendent"]   { background: var(--color-col-pendent); }
 .kanban-col[data-estat="En curs"]   { background: var(--color-col-en-curs); }
@@ -317,7 +357,6 @@ a { color: var(--color-primari); }
   font-weight: 600;
   margin-bottom: 6px;
   line-height: 1.4;
-  overflow-wrap: anywhere; /* trenca paraules/codis molt llargs perquè no eixamplin la targeta */
 }
 .targeta-meta {
   display: flex;
@@ -329,7 +368,6 @@ a { color: var(--color-primari); }
   display: flex;
   align-items: center;
   gap: 4px;
-  flex-wrap: wrap; /* permet que el badge "Endarrerida" passi a la línia següent en lloc de desbordar */
   font-size: 11px;
   color: var(--color-text-suau);
 }
@@ -824,8 +862,6 @@ a { color: var(--color-primari); }
   letter-spacing: .4px;
   vertical-align: middle;
 }
-/* Badge "Endarrerida" col·locat a dalt de tot de la targeta */
-.targeta-vencuda-top { margin-bottom: 8px; }
 .data-vencuda { color: var(--color-perill); font-weight: 600; }
 .gantt-barra--vencuda {
   outline: 2px solid var(--color-perill);
