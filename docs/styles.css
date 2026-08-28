@@ -112,6 +112,15 @@ a { color: var(--color-primari); }
 }
 .calendari-link:hover { text-decoration: underline; }
 
+.calendari-links { display: inline-flex; align-items: center; gap: 14px; }
+
+.calendari-link-secundari {
+  font-weight: 500;
+  color: var(--color-text-suau);
+  font-size: 12px;
+}
+.calendari-link-secundari:hover { color: var(--color-primari-fosc); }
+
 .calendari-avis {
   display: inline-flex;
   align-items: center;
