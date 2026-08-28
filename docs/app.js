@@ -14,6 +14,13 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzpXtPLh5AzRAXtyB3ylFMs
 // Clau localStorage on es guarda el token de sessió
 const SESSION_KEY = "planificador_sess_v1";
 
+// Calendari compartit de l'equip — només l'enllaç, mai dades sensibles
+const CALENDARI_ID  = "c_29ccc6dd1f09230840c99218fbcad2d8660411906d2fdf07a7dc1987e4a1087e@group.calendar.google.com";
+const CALENDARI_URL = "https://calendar.google.com/calendar/embed?src=" + encodeURIComponent(CALENDARI_ID);
+
+// Clau localStorage per recordar quin avís d'esdeveniment s'ha descartat
+const CALENDARI_AVIS_KEY = "planificador_calendari_avis_v1";
+
 // ---------- ESTAT GLOBAL ----------
 const App = {
   usuari:          null,
@@ -81,6 +88,7 @@ async function crideApi(payload) {
 async function apiSessio()         { return crideApi({ accio: "sessio" }); }
 async function apiLlistarTasques() { return crideApi({ accio: "llistarTasques" }); }
 async function apiObtenirAvisos()  { return crideApi({ accio: "obtenirAvisos" }); }
+async function apiObtenirProxEsdeveniment() { return crideApi({ accio: "obtenirProxEsdeveniment" }); }
 async function apiSincronitzar()   { return crideApi({ accio: "sincronitzarTasquesDesDeDocs" }); }
 
 async function apiCrearTasca(dades)    { return crideApi(Object.assign({ accio: "crearTasca" }, dades)); }
@@ -109,6 +117,15 @@ function dataATimestamp(iso) {
   return iso ? new Date(iso + "T00:00:00").getTime() : null;
 }
 
+// Formata la data/hora ISO d'un esdeveniment de calendari per mostrar-la a l'avís
+function formatarDataEsdeveniment(isoDatetime, totDia) {
+  const d = new Date(isoDatetime);
+  const dataStr = `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`;
+  if (totDia) return dataStr;
+  const hora = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  return `${dataStr} ${hora}`;
+}
+
 function estaVencuda(t) {
   return t.data_fi && t.estat !== "Feta" && t.data_fi < avuiISO();
 }
@@ -129,6 +146,44 @@ function mostrarBanner(missatge, tipus = "info", durada = 4000) {
   b.className   = `banner-estat banner-${tipus}`;
   b.style.display = "block";
   if (durada > 0) setTimeout(() => { b.style.display = "none"; }, durada);
+}
+
+// ============================================================
+// CALENDARI COMPARTIT
+// ============================================================
+
+// Consulta si hi ha un esdeveniment proper (2 setmanes) i mostra un avís
+// discret a la barra superior, si escau. No bloqueja res més de la UI.
+async function comprovarProperEsdeveniment() {
+  const el = document.getElementById("calendari-avis");
+  if (!el) return;
+
+  const r = await apiObtenirProxEsdeveniment();
+  if (!r.ok || !r.esdeveniment) { el.style.display = "none"; return; }
+
+  const ev    = r.esdeveniment;
+  const clau  = `${ev.inici}|${ev.titol}`;
+  if (localStorage.getItem(CALENDARI_AVIS_KEY) === clau) { el.style.display = "none"; return; }
+
+  const extra = r.total > 1 ? ` (+${r.total - 1} més en 2 setmanes)` : "";
+  el.innerHTML = "";
+
+  const text = document.createElement("span");
+  text.textContent = `🔔 Proper esdeveniment: ${ev.titol} · ${formatarDataEsdeveniment(ev.inici, ev.totDia)}${extra}`;
+
+  const tancar = document.createElement("button");
+  tancar.type      = "button";
+  tancar.className = "calendari-avis-tancar";
+  tancar.title     = "Amaga aquest avís";
+  tancar.textContent = "✕";
+  tancar.addEventListener("click", () => {
+    localStorage.setItem(CALENDARI_AVIS_KEY, clau);
+    el.style.display = "none";
+  });
+
+  el.appendChild(text);
+  el.appendChild(tancar);
+  el.style.display = "inline-flex";
 }
 
 function obtenirSubtasques(codiMare) {
@@ -202,6 +257,10 @@ function mostrarUIAutenticat() {
 // ============================================================
 
 async function inicialitzar() {
+  // Enllaç al calendari compartit — visible sempre, autenticat o no
+  const enllacCalendari = document.getElementById("calendari-enllac");
+  if (enllacCalendari) enllacCalendari.href = CALENDARI_URL;
+
   // Pas 1: comprovar si la URL porta un token de sessió nou (retorn del flux auth)
   const urlParams    = new URLSearchParams(window.location.search);
   const nouToken     = urlParams.get("session_token");
@@ -245,6 +304,7 @@ async function inicialitzar() {
   mostrarUIAutenticat();
   configurarEventos();
   await carregarTasques();
+  comprovarProperEsdeveniment(); // no bloqueja la càrrega principal
 }
 
 // ============================================================
@@ -348,7 +408,6 @@ function crearTargetaKanban(t) {
     .join("");
 
   div.innerHTML = `
-    ${vencuda ? '<div class="targeta-vencuda-top"><span class="badge-vencuda">Endarrerida</span></div>' : ""}
     ${t.projecte ? `<div class="badge-projecte">${escHtml(t.projecte)}</div>` : ""}
     <div class="targeta-titol">${escHtml(t.tasca)}</div>
     ${t.descripcio ? `<div class="targeta-descripcio">${escHtml(t.descripcio.length > 100 ? t.descripcio.slice(0, 100) + "…" : t.descripcio)}</div>` : ""}
@@ -360,6 +419,7 @@ function crearTargetaKanban(t) {
       <div class="targeta-meta-fila">
         <span>Inici:</span> ${escHtml(formatarData(t.data_inici))} &nbsp;·&nbsp;
         <span>Fi:</span> <span class="${vencuda ? "data-vencuda" : ""}">${escHtml(formatarData(t.data_fi))}</span>
+        ${vencuda ? '<span class="badge-vencuda">Endarrerida</span>' : ""}
       </div>
       ${llistarParticipants(t).length > 0 ? `
       <div class="targeta-meta-fila">
@@ -509,7 +569,7 @@ function renderitzarPerPersona() {
       <div class="persona-cap">
         <div class="persona-avatar avatar-${escHtml(membre)}">${ini[membre]||membre.slice(0,2).toUpperCase()}</div>
         <span class="persona-nom">${escHtml(membre)}</span>
-        <span class="persona-recompte">${tt.length} ${tt.length!==1?"tasques actives":"tasca activa"}</span>
+        <span class="persona-recompte">${tt.length} tasca${tt.length!==1?"s":""} activa${tt.length!==1?"s":""}</span>
       </div>
       <div class="persona-tasques">
         ${tt.length === 0
@@ -570,7 +630,7 @@ function renderitzarPerProjecte() {
     <div class="persona-grup">
       <div class="persona-cap">
         <span class="badge-projecte" style="font-size:13px;padding:3px 10px">${escHtml(nom)}</span>
-        <span class="persona-recompte">${tt.length} ${tt.length !== 1 ? "tasques" : "tasca"}</span>
+        <span class="persona-recompte">${tt.length} tasca${tt.length !== 1 ? "s" : ""}</span>
       </div>
       <div class="persona-tasques">${files}</div>
     </div>`;
