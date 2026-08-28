@@ -15,8 +15,10 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzpXtPLh5AzRAXtyB3ylFMs
 const SESSION_KEY = "planificador_sess_v1";
 
 // Calendari compartit de l'equip — només l'enllaç, mai dades sensibles
+// (u/0/r?cid=... obre l'app completa de Calendar, amb permisos d'edició si l'usuari en té;
+// /calendar/embed és només de lectura encara que tinguis accés d'edició)
 const CALENDARI_ID  = "c_29ccc6dd1f09230840c99218fbcad2d8660411906d2fdf07a7dc1987e4a1087e@group.calendar.google.com";
-const CALENDARI_URL = "https://calendar.google.com/calendar/embed?src=" + encodeURIComponent(CALENDARI_ID);
+const CALENDARI_URL = "https://calendar.google.com/calendar/u/0/r?cid=" + encodeURIComponent(CALENDARI_ID);
 
 // Clau localStorage per recordar quin avís d'esdeveniment s'ha descartat
 const CALENDARI_AVIS_KEY = "planificador_calendari_avis_v1";
